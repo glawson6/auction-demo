@@ -1,0 +1,247 @@
+buildscript {
+    repositories {
+        // mavenLocal()
+        mavenCentral()
+        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        maven {
+            url 'https://geonet.artifactoryonline.com/geonet/public-releases'
+        }
+
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.3.5.RELEASE")
+        classpath("mysql:mysql-connector-java:5.1.38")
+        classpath 'com.netflix.nebula:gradle-ospackage-plugin:3.4.0'
+        classpath('com.mashape.unirest:unirest-java:1.4.7')
+        classpath('org.mongodb:bson:3.0.4')
+        classpath "org.flywaydb:flyway-gradle-plugin:3.2.1"
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0"
+    }
+}
+
+group 'com.ttis'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'spring-boot'
+
+apply from: 'dbUtils.gradle'
+allprojects {
+    apply plugin: 'groovy'
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'org.flywaydb.flyway'
+    apply plugin: 'nebula.ospackage'
+    apply plugin: 'spring-boot'
+
+    repositories {
+        // mavenLocal()
+        mavenCentral()
+        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        maven {
+            url 'https://geonet.artifactoryonline.com/geonet/public-releases'
+        }
+    }
+}
+sourceCompatibility = 1.8
+
+sourceSets {
+    main {
+        groovy {
+            // override the default locations, rather than adding additional ones
+            srcDirs = ['src/main/groovy', 'src/main/java']
+        }
+        java {
+            srcDirs = [] // don't compile Java code twice
+        }
+    }
+}
+
+
+ext {
+    camelVersion = "2.16.2"
+}
+
+repositories {
+    // mavenLocal()
+    mavenCentral()
+    jcenter()
+    maven {
+        url "https://plugins.gradle.org/m2/"
+    }
+    maven {
+        url 'https://geonet.artifactoryonline.com/geonet/public-releases'
+    }
+}
+
+task upFlywayContext << {
+    def databaseURL = System.getenv("DATABASE_URL");
+    System.out.println("Using => " + databaseURL);
+    def dbInfo = DBConfigUtil.extractDatabaseConnectionInfo("rfp", databaseURL);
+    def jdbcURL = DBConfigUtil.createJdbcUrl("rfp", databaseURL);
+    flyway.url = jdbcURL
+    flyway.user = dbInfo[DBConfigUtil.USER]
+    flyway.password = dbInfo[DBConfigUtil.PASSWORD]
+}
+
+tasks.findAll { task -> task.getName().startsWith("flyway") }.each {
+    it.dependsOn upFlywayContext
+}
+
+flyway {
+    driver = 'com.mysql.jdbc.Driver'
+    // url = 'jdbc:mysql://localhost:3306/proposal?autoReconnect=true'
+    // user = 'rfp_app'
+    // password = 'rfp_app'
+    schemas = ['auction_demo']
+    table = 'schema_history'
+    baselineVersion = '1.0.0'
+    baselineDescription = "Initial Tenant Config Database"
+    //callbacks = ['com.mycompany.proj.CustomCallback', 'com.mycompany.proj.AnotherCallback']
+}
+
+jar {
+    archiveName = "auction-demo-${version}.${extension}"
+}
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-actuator")
+    compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    compile("org.springframework.boot:spring-boot-starter-security")
+    compile("mysql:mysql-connector-java:5.1.38")
+    compile('org.flywaydb:flyway-core')
+    compile("com.zaxxer:HikariCP:2.4.3")
+    compile('com.fasterxml.jackson.datatype:jackson-datatype-hibernate4:2.7.0')
+    compile('commons-lang:commons-lang:2.6')
+    compile 'org.pojomatic:pojomatic:2.0.1'
+    compile("com.amazonaws:aws-java-sdk:1.9.0")
+    compile('org.jadira.usertype:usertype.extended:5.0.0.GA')
+    compile("commons-io:commons-io:2.4")
+    compile('com.mashape.unirest:unirest-java:1.4.7')
+    compile("org.apache.camel:camel-core:${camelVersion}")
+    compile("org.apache.camel:camel-spring-boot:${camelVersion}")
+    compile("org.apache.camel:camel-mvel:${camelVersion}")
+    compile("org.apache.camel:camel-rabbitmq:${camelVersion}")
+    compile("org.apache.camel:camel-http4:${camelVersion}")
+    testCompile("xmlunit:xmlunit:1.5")
+    testCompile("commons-io:commons-io:2.4")
+    testCompile("junit:junit")
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+    //testCompile("org.springframework.boot:spring-test-mvc")
+    testCompile("org.dbunit:dbunit:2.5.0")
+    testCompile("com.github.springtestdbunit:spring-test-dbunit:1.2.0")
+    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.3'
+}
+
+project(':spring-security-demo') {
+
+    sourceSets {
+        main {
+            groovy {
+                // override the default locations, rather than adding additional ones
+                srcDirs = ['src/main/groovy', 'src/main/java']
+            }
+            java {
+                srcDirs = [] // don't compile Java code twice
+            }
+        }
+    }
+    dependencies {
+
+        compile("org.springframework.boot:spring-boot-starter-data-jpa")
+        compile("org.springframework.boot:spring-boot-starter-security")
+        testCompile("org.springframework.boot:spring-boot-starter-test")
+        testCompile("org.dbunit:dbunit:2.5.0")
+        testCompile("com.github.springtestdbunit:spring-test-dbunit:1.2.0")
+    }
+}
+
+project(':auction-data-rest') {
+
+    sourceSets {
+        main {
+            groovy {
+                // override the default locations, rather than adding additional ones
+                srcDirs = ['src/main/groovy', 'src/main/java']
+            }
+            java {
+                srcDirs = [] // don't compile Java code twice
+            }
+        }
+    }
+    dependencies {
+        compile project(":spring-security-demo")
+        compile("org.springframework.boot:spring-boot-starter-web")
+        compile("org.springframework.boot:spring-boot-starter-data-jpa")
+        compile("org.springframework.boot:spring-boot-starter-data-rest")
+        compile("org.springframework.boot:spring-boot-starter-actuator")
+        compile("org.springframework.boot:spring-boot-starter-security")
+        compile("mysql:mysql-connector-java:5.1.38")
+        compile('org.flywaydb:flyway-core')
+        compile("com.zaxxer:HikariCP:2.4.3")
+        compile('com.fasterxml.jackson.datatype:jackson-datatype-hibernate4:2.7.0')
+        compile('commons-lang:commons-lang:2.6')
+        compile 'org.pojomatic:pojomatic:2.0.1'
+        compile("com.amazonaws:aws-java-sdk:1.9.0")
+        compile('org.jadira.usertype:usertype.extended:5.0.0.GA')
+        compile("commons-io:commons-io:2.4")
+        compile('com.mashape.unirest:unirest-java:1.4.7')
+        compile("org.apache.camel:camel-core:${camelVersion}")
+        compile("org.apache.camel:camel-spring-boot:${camelVersion}")
+        compile("org.apache.camel:camel-mvel:${camelVersion}")
+        compile("org.apache.camel:camel-rabbitmq:${camelVersion}")
+        compile("org.apache.camel:camel-http4:${camelVersion}")
+        testCompile("xmlunit:xmlunit:1.5")
+        testCompile("commons-io:commons-io:2.4")
+        testCompile("junit:junit")
+        testCompile("org.springframework.boot:spring-boot-starter-test")
+        //testCompile("org.springframework.boot:spring-test-mvc")
+        testCompile("org.dbunit:dbunit:2.5.0")
+        testCompile("com.github.springtestdbunit:spring-test-dbunit:1.2.0")
+        compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.3'
+    }
+}
+project(':spring-security-demo') {
+
+    sourceSets {
+        main {
+            groovy {
+                // override the default locations, rather than adding additional ones
+                srcDirs = ['src/main/groovy', 'src/main/java']
+            }
+            java {
+                srcDirs = [] // don't compile Java code twice
+            }
+        }
+    }
+    dependencies {
+        compile("org.springframework.boot:spring-boot-starter-web")
+        compile("org.springframework.boot:spring-boot-starter-security")
+        compile('com.fasterxml.jackson.datatype:jackson-datatype-hibernate4:2.7.0')
+        compile('org.apache.commons:commons-lang3:3.4')
+        compile 'org.pojomatic:pojomatic:2.0.1'
+        compile("com.amazonaws:aws-java-sdk:1.9.0")
+        compile('org.jadira.usertype:usertype.extended:5.0.0.GA')
+        compile("commons-io:commons-io:2.4")
+        compile('com.mashape.unirest:unirest-java:1.4.7')
+        testCompile("xmlunit:xmlunit:1.5")
+        testCompile("commons-io:commons-io:2.4")
+        testCompile("junit:junit")
+        testCompile("org.springframework.boot:spring-boot-starter-test")
+        //testCompile("org.springframework.boot:spring-test-mvc")
+        testCompile("org.dbunit:dbunit:2.5.0")
+        testCompile("com.github.springtestdbunit:spring-test-dbunit:1.2.0")
+        compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.3'
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.12'
+}

@@ -1,0 +1,4 @@
+rootProject.name = 'auction-demo'
+include 'spring-security-demo'
+include 'auction-data-rest'
+
