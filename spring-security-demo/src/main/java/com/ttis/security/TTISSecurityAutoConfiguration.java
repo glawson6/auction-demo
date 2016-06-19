@@ -131,6 +131,7 @@ public class TTISSecurityAutoConfiguration {
         }
 
         @Bean
+        @ConditionalOnMissingBean(AuthenticationProvider.class)
         AuthenticationProvider preAuthProvider(){
             PreAuthenticatedAuthenticationProvider provider = new PreAuthenticatedAuthenticationProvider();
             provider.setPreAuthenticatedUserDetailsService(authenticationUserDetailsService());

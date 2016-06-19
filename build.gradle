@@ -224,6 +224,7 @@ project(':spring-security-demo') {
     dependencies {
         compile("org.springframework.boot:spring-boot-starter-web")
         compile("org.springframework.boot:spring-boot-starter-security")
+        compile group: 'org.springframework.security', name: 'spring-security-ldap', version: '4.0.4.RELEASE'
         compile('com.fasterxml.jackson.datatype:jackson-datatype-hibernate4:2.7.0')
         compile('org.apache.commons:commons-lang3:3.4')
         compile 'org.pojomatic:pojomatic:2.0.1'

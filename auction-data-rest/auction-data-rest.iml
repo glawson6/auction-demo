@@ -176,5 +176,8 @@
     <orderEntry type="library" name="Gradle: com.google.guava:guava:16.0.1" level="project" />
     <orderEntry type="library" name="Gradle: com.github.fge:btf:1.2" level="project" />
     <orderEntry type="module" module-name="spring-security-demo" />
+    <orderEntry type="library" name="Gradle: org.springframework.security:spring-security-ldap:4.0.4.RELEASE" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.commons:commons-lang3:3.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.springframework.ldap:spring-ldap-core:2.0.2.RELEASE" level="project" />
   </component>
 </module>

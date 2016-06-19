@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,10 +43,15 @@ public class TTISProcessingFilter extends GenericFilterBean {
         if (StringUtils.isNotEmpty(authHeaderContent)) {
 
             try {
-                PreAuthenticatedAuthenticationToken authToken = new PreAuthenticatedAuthenticationToken(authHeaderContent, "N/A" );
+            //    PreAuthenticatedAuthenticationToken authToken = new PreAuthenticatedAuthenticationToken(authHeaderContent, "N/A" );
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(authHeaderContent, "password" );
                 Authentication authentication = authenticationManager.authenticate(authToken);
-                authentication.setAuthenticated(true);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                PreAuthenticatedAuthenticationToken preAuthToken = new PreAuthenticatedAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials(),authentication.getAuthorities());
+                preAuthToken.setAuthenticated(true);
+                LOGGER.debug("Granted authories authentication {}",authentication.getAuthorities().toString());
+                LOGGER.debug("Granted authories preAuthToken {}",preAuthToken.getAuthorities().toString());
+                //authentication.setAuthenticated(true);
+                SecurityContextHolder.getContext().setAuthentication(preAuthToken);
 
             } catch (AuthenticationException ae) {
                 LOGGER.error("Error while authenticating the user {}", authHeaderContent, ae);
@@ -67,7 +73,7 @@ public class TTISProcessingFilter extends GenericFilterBean {
     @Override
     protected void initFilterBean() throws ServletException {
         Assert.notNull(authenticationEntryPoint, "An AuthenticationEntryPoint must be set");
-        Assert.notNull(iamAuthenticationManager, "An AuthenticationManager must be set");
+        Assert.notNull(authenticationManager, "An AuthenticationManager must be set");
     }
 
     public AuthenticationEntryPoint getAuthenticationEntryPoint() {
@@ -79,10 +85,10 @@ public class TTISProcessingFilter extends GenericFilterBean {
     }
 
     public AuthenticationManager getIamAuthenticationManager() {
-        return iamAuthenticationManager;
+        return authenticationManager;
     }
 
     public void setIamAuthenticationManager(AuthenticationManager iamAuthenticationManager) {
-        this.iamAuthenticationManager = iamAuthenticationManager;
+        this.authenticationManager = iamAuthenticationManager;
     }
 }

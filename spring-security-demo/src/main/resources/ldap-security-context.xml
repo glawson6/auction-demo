@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="contextSource"
+          class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
+        <constructor-arg value="ldap://directory.taptech.net:389/dc=directory,dc=gregorylawson,dc=net"/>
+        <property name="userDn" value="uid=root,cn=users,dc=directory,dc=gregorylawson,dc=net"/>
+        <property name="password" value="Bigg6dogg!"/>
+    </bean>
+
+    <bean id="preAuthProvider"
+          class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
+        <constructor-arg>
+            <bean class="org.springframework.security.ldap.authentication.BindAuthenticator">
+                <constructor-arg ref="contextSource"/>
+                <property name="userDnPatterns">
+                    <list><value>uid={0},cn=users</value></list>
+                </property>
+            </bean>
+        </constructor-arg>
+        <constructor-arg>
+            <bean
+                    class="org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator">
+                <constructor-arg ref="contextSource"/>
+                <constructor-arg value="cn=groups"/>
+                <property name="groupRoleAttribute" value="cn"/>
+                <property name="rolePrefix" value=""/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+</beans>
