@@ -33,7 +33,6 @@ allprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
     apply plugin: 'eclipse'
-    apply plugin: 'org.flywaydb.flyway'
     apply plugin: 'nebula.ospackage'
     apply plugin: 'spring-boot'
 
@@ -80,35 +79,7 @@ repositories {
     }
 }
 
-task upFlywayContext << {
-    def databaseURL = System.getenv("DATABASE_URL");
-    System.out.println("Using => " + databaseURL);
-    def dbInfo = DBConfigUtil.extractDatabaseConnectionInfo("rfp", databaseURL);
-    def jdbcURL = DBConfigUtil.createJdbcUrl("rfp", databaseURL);
-    flyway.url = jdbcURL
-    flyway.user = dbInfo[DBConfigUtil.USER]
-    flyway.password = dbInfo[DBConfigUtil.PASSWORD]
-}
 
-tasks.findAll { task -> task.getName().startsWith("flyway") }.each {
-    it.dependsOn upFlywayContext
-}
-
-flyway {
-    driver = 'com.mysql.jdbc.Driver'
-    // url = 'jdbc:mysql://localhost:3306/proposal?autoReconnect=true'
-    // user = 'rfp_app'
-    // password = 'rfp_app'
-    schemas = ['auction_demo']
-    table = 'schema_history'
-    baselineVersion = '1.0.0'
-    baselineDescription = "Initial Tenant Config Database"
-    //callbacks = ['com.mycompany.proj.CustomCallback', 'com.mycompany.proj.AnotherCallback']
-}
-
-jar {
-    archiveName = "auction-demo-${version}.${extension}"
-}
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
@@ -163,7 +134,76 @@ project(':spring-security-demo') {
     }
 }
 
+project(':spring-security-demo') {
+
+    sourceSets {
+        main {
+            groovy {
+                // override the default locations, rather than adding additional ones
+                srcDirs = ['src/main/groovy', 'src/main/java']
+            }
+            java {
+                srcDirs = [] // don't compile Java code twice
+            }
+        }
+    }
+    dependencies {
+        compile("org.springframework.boot:spring-boot-starter-web")
+        compile("org.springframework.boot:spring-boot-starter-security")
+        compile group: 'org.springframework.security', name: 'spring-security-ldap', version: '4.0.4.RELEASE'
+        compile('com.fasterxml.jackson.datatype:jackson-datatype-hibernate4:2.7.0')
+        compile('org.apache.commons:commons-lang3:3.4')
+        compile 'org.pojomatic:pojomatic:2.0.1'
+        compile("com.amazonaws:aws-java-sdk:1.9.0")
+        compile('org.jadira.usertype:usertype.extended:5.0.0.GA')
+        compile("commons-io:commons-io:2.4")
+        compile('com.mashape.unirest:unirest-java:1.4.7')
+        testCompile("xmlunit:xmlunit:1.5")
+        testCompile("commons-io:commons-io:2.4")
+        testCompile("junit:junit")
+        testCompile("org.springframework.boot:spring-boot-starter-test")
+        //testCompile("org.springframework.boot:spring-test-mvc")
+        testCompile("org.dbunit:dbunit:2.5.0")
+        testCompile("com.github.springtestdbunit:spring-test-dbunit:1.2.0")
+        compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.3'
+    }
+}
+
 project(':auction-data-rest') {
+
+
+    apply plugin: 'org.flywaydb.flyway'
+    /*
+    jar {
+        archiveName = "auction-demo-${version}.${extension}"
+    }
+    */
+
+    task upFlywayContext << {
+        def databaseURL = System.getenv("DATABASE_URL");
+        System.out.println("Using => " + databaseURL);
+        def dbInfo = DBConfigUtil.extractDatabaseConnectionInfo("rfp", databaseURL);
+        def jdbcURL = DBConfigUtil.createJdbcUrl("rfp", databaseURL);
+        flyway.url = jdbcURL
+        flyway.user = dbInfo[DBConfigUtil.USER]
+        flyway.password = dbInfo[DBConfigUtil.PASSWORD]
+    }
+
+    tasks.findAll { task -> task.getName().startsWith("flyway") }.each {
+        it.dependsOn upFlywayContext
+    }
+
+    flyway {
+        driver = 'com.mysql.jdbc.Driver'
+        // url = 'jdbc:mysql://localhost:3306/proposal?autoReconnect=true'
+        // user = 'rfp_app'
+        // password = 'rfp_app'
+        schemas = ['auction']
+        table = 'schema_history'
+        baselineVersion = '1.0.0'
+        baselineDescription = "Initial Tenant Config Database"
+        //callbacks = ['com.mycompany.proj.CustomCallback', 'com.mycompany.proj.AnotherCallback']
+    }
 
     sourceSets {
         main {
@@ -208,41 +248,6 @@ project(':auction-data-rest') {
         compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.3'
     }
 }
-project(':spring-security-demo') {
-
-    sourceSets {
-        main {
-            groovy {
-                // override the default locations, rather than adding additional ones
-                srcDirs = ['src/main/groovy', 'src/main/java']
-            }
-            java {
-                srcDirs = [] // don't compile Java code twice
-            }
-        }
-    }
-    dependencies {
-        compile("org.springframework.boot:spring-boot-starter-web")
-        compile("org.springframework.boot:spring-boot-starter-security")
-        compile group: 'org.springframework.security', name: 'spring-security-ldap', version: '4.0.4.RELEASE'
-        compile('com.fasterxml.jackson.datatype:jackson-datatype-hibernate4:2.7.0')
-        compile('org.apache.commons:commons-lang3:3.4')
-        compile 'org.pojomatic:pojomatic:2.0.1'
-        compile("com.amazonaws:aws-java-sdk:1.9.0")
-        compile('org.jadira.usertype:usertype.extended:5.0.0.GA')
-        compile("commons-io:commons-io:2.4")
-        compile('com.mashape.unirest:unirest-java:1.4.7')
-        testCompile("xmlunit:xmlunit:1.5")
-        testCompile("commons-io:commons-io:2.4")
-        testCompile("junit:junit")
-        testCompile("org.springframework.boot:spring-boot-starter-test")
-        //testCompile("org.springframework.boot:spring-test-mvc")
-        testCompile("org.dbunit:dbunit:2.5.0")
-        testCompile("com.github.springtestdbunit:spring-test-dbunit:1.2.0")
-        compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.3'
-    }
-}
-
 task wrapper(type: Wrapper) {
     gradleVersion = '2.12'
 }

@@ -11,3 +11,5 @@ http://docs.spring.io/spring-security/site/docs/3.0.x/reference/ldap.html
 http://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/#ldap
 
 http://shiro.apache.org/java-authorization-guide.html
+
+./gradlew clean build && java -Dldap.config.java=true -jar auction-data-rest/build/libs/auction-data-rest.jar 

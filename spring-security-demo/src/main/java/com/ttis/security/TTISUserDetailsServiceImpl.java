@@ -7,12 +7,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
 /**
- * Created by Muruganandham on 1/15/2016.
- *
- * TTISUserDetailsServiceImpl will handle loading the user details from IAM
- *
+ * Created by tap on 6/18/16.
  */
 public class TTISUserDetailsServiceImpl implements AuthenticationUserDetailsService {
 

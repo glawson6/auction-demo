@@ -1,6 +1,7 @@
 package com.ttis.security;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -39,12 +40,15 @@ public class TTISProcessingFilter extends GenericFilterBean {
         HttpServletResponse response = (HttpServletResponse) resp;
         HttpServletRequest request = (HttpServletRequest) req;
         String authHeaderContent = request.getHeader(HEADER_UID);
-        LOGGER.debug("uid received is {}", authHeaderContent);
+        String decoded = new String(Base64.decodeBase64(authHeaderContent));
+        String user = decoded.substring(0, decoded.indexOf(":"));
+        String password = decoded.substring(decoded.indexOf(":")+1);
+        LOGGER.debug("uid {} user {} password {}", new Object[]{authHeaderContent, user, password});
         if (StringUtils.isNotEmpty(authHeaderContent)) {
 
             try {
             //    PreAuthenticatedAuthenticationToken authToken = new PreAuthenticatedAuthenticationToken(authHeaderContent, "N/A" );
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(authHeaderContent, "password" );
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user, password);
                 Authentication authentication = authenticationManager.authenticate(authToken);
                 PreAuthenticatedAuthenticationToken preAuthToken = new PreAuthenticatedAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials(),authentication.getAuthorities());
                 preAuthToken.setAuthenticated(true);

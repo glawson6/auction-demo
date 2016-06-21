@@ -13,13 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * Created by Muruganandham on 1/14/2016.
- *
- * Rest api entry point allows customized AuthenticationEntryPoint to be set on the ExceptionTranslationFilter.
- *
- */
-
 public abstract class TTISAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TTISAuthenticationEntryPoint.class);

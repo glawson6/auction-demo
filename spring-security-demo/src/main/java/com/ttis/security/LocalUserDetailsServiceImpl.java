@@ -21,18 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-/**
- * Created by Muruganandham on 1/15/2016.
- *
- * LOCALUserDetailsServiceImpl will handle loading user details from local for the developers.
- *
- * This will be used only in developers machine those who do not have IAM setup.
- *
- * This class will look for the file ${catalina.base}/conf/examplelocaluserdetails.json,
- * if present then read construct the user details using the json.
- * If not present then will read the resources/examplelocaluserdetails.json abd construct the user details using the json.
- *
- */
+
 public class LocalUserDetailsServiceImpl implements AuthenticationUserDetailsService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LocalUserDetailsServiceImpl.class);

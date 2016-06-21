@@ -1,12 +1,6 @@
 package com.ttis.security;
 
 /**
- * User: chenry
- * Date: 6/18/11
- * Time: 5:09 AM
- */
-
-/**
  * Utility enum to make it easy to keep up with all the error codes
  */
 public interface RemoteErrorCodes {

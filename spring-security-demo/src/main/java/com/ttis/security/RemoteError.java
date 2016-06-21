@@ -4,12 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.UUID;
 
-/**
- * User: Carlos Lawton
- * Date: 9/6/12
- * Time: 12:29 PM
- */
-@SuppressWarnings("PMD")
+
 public class RemoteError {
 
     private String code;

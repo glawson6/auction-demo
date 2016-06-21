@@ -4,11 +4,7 @@ package com.ttis.security;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.joda.time.DateTime;
 
-/**
- * User: Carlos Lawton
- * Date: 9/6/12
- * Time: 12:28 PM
- */
+
 public class RemoteResponse<T> {
 
     private boolean success;
