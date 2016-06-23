@@ -22,9 +22,9 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 
-public class LocalUserDetailsServiceImpl implements AuthenticationUserDetailsService {
+public class FileUserDetailsServiceImpl implements AuthenticationUserDetailsService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LocalUserDetailsServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileUserDetailsServiceImpl.class);
 
     private String userDetailsJSONFile;
 
@@ -43,25 +43,14 @@ public class LocalUserDetailsServiceImpl implements AuthenticationUserDetailsSer
         UserDetails principal = null;
 
         try {
-            List<String> authzTokenList = null;
+            TTISUserToken userToken = null;
             Resource resource = resourceLoader.getResource(userDetailsJSONFile);
             String userDetailsJson = IOUtils.toString(new InputStreamReader(resource.getInputStream()));
             LOGGER.debug("Found file {}...",resource.getURI().toString());
             if(StringUtils.isNotEmpty(userDetailsJson)) {
-                authzTokenList = mapper.readValue(userDetailsJson, new TypeReference<List<String>>(){});
+                userToken = mapper.readValue(userDetailsJson, new TypeReference<TTISUserToken>(){});
             }
-
-            /*
-            if(authzTokenList != null ) {
-                for(AuthzToken authzToken : authzTokenList){
-                    if(StringUtils.isNotEmpty(userName) && StringUtils.isNotEmpty(authzToken.getUserName()) && StringUtils.equalsIgnoreCase(userName, authzToken.getUserName()))
-                    {
-                        principal = new RFUserDetails(authzToken);
-                    }
-                }
-            }
-            */
-            principal = new TTISUser();
+            principal = new TTISUser(userToken);
 
         } catch (JsonParseException ex ){
             LOGGER.error("Error while parsing the userdetails Json",  ex);

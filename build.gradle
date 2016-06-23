@@ -168,11 +168,64 @@ project(':spring-security-demo') {
         compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.3'
     }
 }
+class DatabaseURLHandler  extends URLStreamHandler {
+    public static final String DATABASE_NAME = "databaseName";
+    public static final String SERVER_NAME = "serverName";
+    public static final String USER = "user";
+    public static final String URL_OPTIONS = "urlOptions";
+    public static final String PASSWORD = "password";
+    public static final String PROTOCOL = "protocol";
+    public static final String PORT = "port";
+    public static final String QUESTION_MARK = "?";
+
+    @Override
+    protected URLConnection openConnection(URL u) throws IOException {
+        return null
+    }
+}
+
+public Map<String, String> extractDBInfo(String dbURLStr) throws MalformedURLException {
+    Map<String, String> dbInfo = new HashMap<String, String>();
+    if (null != dbURLStr) {
+        URL url = new URL(null, dbURLStr, new DatabaseURLHandler());
+        logger.debug("url.getPath() {}", url.getPath());
+        logger.debug("url.getHost() {}", url.getHost());
+        logger.debug("url.getUserInfo() {}", url.getUserInfo());
+        dbInfo.put(DatabaseURLHandler.PROTOCOL, url.getProtocol());
+        dbInfo.put(DatabaseURLHandler.PORT, String.valueOf(url.getPort()));
+        if (null != url.getQuery()) {
+            dbInfo.put(DatabaseURLHandler.URL_OPTIONS, url.getQuery());
+        }
+        dbInfo.put(DatabaseURLHandler.DATABASE_NAME, url.getPath().substring(1));
+        dbInfo.put(DatabaseURLHandler.SERVER_NAME, url.getHost());
+        String[] userInfo = url.getUserInfo().split(":");
+        dbInfo.put(DatabaseURLHandler.USER, userInfo[0]);
+        dbInfo.put(DatabaseURLHandler.PASSWORD, userInfo[1]);
+    } else {
+        throw new IllegalArgumentException("Cannot pass null db url ");
+    }
+    return dbInfo;
+}
+
+public String createJdbcUrl(String dbURLStr) {
+    Map<String, String> dbInfo = extractDBInfo(dbURLStr);
+    String urlOptions = dbInfo.get(DatabaseURLHandler.URL_OPTIONS);
+    StringBuilder jdbcUrl = new StringBuilder("jdbc:");
+    jdbcUrl.append(dbInfo.get(DatabaseURLHandler.PROTOCOL)).append("://");
+    jdbcUrl.append(dbInfo.get(DatabaseURLHandler.SERVER_NAME)).append(":");
+    jdbcUrl.append(dbInfo.get(DatabaseURLHandler.PORT)).append("/");
+    jdbcUrl.append(dbInfo.get(DatabaseURLHandler.DATABASE_NAME));
+    if (null != urlOptions) {
+        jdbcUrl.append(DatabaseURLHandler.QUESTION_MARK).append(dbInfo.get(DatabaseURLHandler.URL_OPTIONS));
+    }
+    return jdbcUrl.toString();
+}
 
 project(':auction-data-rest') {
 
 
     apply plugin: 'org.flywaydb.flyway'
+    apply from: '../dbUtils.gradle'
     /*
     jar {
         archiveName = "auction-demo-${version}.${extension}"
@@ -182,11 +235,11 @@ project(':auction-data-rest') {
     task upFlywayContext << {
         def databaseURL = System.getenv("DATABASE_URL");
         System.out.println("Using => " + databaseURL);
-        def dbInfo = DBConfigUtil.extractDatabaseConnectionInfo("rfp", databaseURL);
-        def jdbcURL = DBConfigUtil.createJdbcUrl("rfp", databaseURL);
+        def dbInfo = extractDBInfo(databaseURL);
+        def jdbcURL = createJdbcUrl(databaseURL);
         flyway.url = jdbcURL
-        flyway.user = dbInfo[DBConfigUtil.USER]
-        flyway.password = dbInfo[DBConfigUtil.PASSWORD]
+        flyway.user = dbInfo[DatabaseURLHandler.USER]
+        flyway.password = dbInfo[DatabaseURLHandler.PASSWORD]
     }
 
     tasks.findAll { task -> task.getName().startsWith("flyway") }.each {

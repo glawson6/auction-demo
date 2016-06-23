@@ -25,7 +25,7 @@ public class TTISAuthenticationUserDetailsService implements AuthenticationUserD
 //                ResponseEntity response = restTemplate.exchange(this.getAuthzTokenURL(), HttpMethod.GET, requestEntity, AuthzToken.class, new Object[0]);
 //                AuthzToken authzToken = (AuthzToken)response.getBody();
 //                authzToken.setVersion("v3");
-                return new TTISUser();
+                return new TTISUser(new TTISUserToken());
             } catch (Exception var8) {
                 throw new RuntimeException("Cannot load permissions for user "+userName);
             }

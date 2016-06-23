@@ -121,3 +121,16 @@ CREATE TABLE `contact` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+INSERT INTO auction_item_status (ID,NAME,DESCRIPTION) VALUES ('1b7efa13-2c07-41f6-b8ed-85e5274e6a10','SOLD','idicates an auction item as sold');
+INSERT INTO auction_item_status (ID,NAME,DESCRIPTION) VALUES ('b6a103c2-d144-4048-9aa3-44b1ffdc754e','AVAILABLE','idicates an auction is available for purchase');
+INSERT INTO auction_item_status (ID,NAME,DESCRIPTION) VALUES ('6ce72df6-de0d-400e-8673-76265fc164c3','WITHDRAWN','idicates an auction item has been withdrawn from the auction');
+INSERT INTO auction_item_status (ID,NAME,DESCRIPTION) VALUES ('83bc6c2c-b5ba-4eda-855a-33a0db49b052','ENTERED','idicates an auction item is in the system');
+
+INSERT INTO auction_item_category (ID,NAME,DESCRIPTION) VALUES ('d9909dd8-3da6-4b7d-9f8d-a4d156aee462','ELECTRONICS','Anything from Electronics');
+INSERT INTO auction_item_category (ID,NAME,DESCRIPTION) VALUES ('b58a31db-7cf7-40d8-9dda-2e247da29bad','CAR','Car and Auto items');
+INSERT INTO auction_item_category (ID,NAME,DESCRIPTION) VALUES ('a84f6287-f9e6-4b18-b6b9-f62999114a69','COMPUTERS','Anything dealing with Computers');
+INSERT INTO auction_item_category (ID,NAME,DESCRIPTION) VALUES ('00732b64-f7a7-4486-a891-e400b5f5e8b2','OTHER','Anything not specified');
+INSERT INTO auction_item_category (ID,NAME,DESCRIPTION) VALUES ('e67abb70-4f30-40ea-b4c5-41b9c16037e5','WOMENS CLOTHING','Anything for Womens Clothing');
+INSERT INTO auction_item_category (ID,NAME,DESCRIPTION) VALUES ('89c4349e-b303-480f-826c-d67acb619353','MENS CLOTHING','Anything for Mens Clothing');
+INSERT INTO auction_item_category (ID,NAME,DESCRIPTION) VALUES ('5163ab81-8dad-4cd4-8a62-be7d5f692b04','KITCHEN','Anything in the kitchen');

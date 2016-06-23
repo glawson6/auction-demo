@@ -3,29 +3,50 @@ package com.ttis.security;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collector;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Created by tap on 6/18/16.
  */
 public class TTISUser implements TTISUserDetails {
+
+    private TTISUserToken ttisUserToken;
+
+    public TTISUser(TTISUserToken ttisUserToken) {
+        this.ttisUserToken = ttisUserToken;
+    }
+
+    Function<String, GrantedAuthority> grantedAuthFunction = (permAuth) -> {
+        return new GrantedAuthority() {
+            @Override
+            public String getAuthority() {
+                return permAuth;
+            }
+        };
+    };
+
     @Override
     public Collection<? extends GrantedAuthority> getPermissions() {
-        return null;
+        return ttisUserToken.getPermissions().stream().map(grantedAuthFunction).collect(toList());
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return ttisUserToken.getRoles().stream().map(grantedAuthFunction).collect(toList());
     }
 
     @Override
     public String getPassword() {
-        return null;
+        return ttisUserToken.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return ttisUserToken.getUserName();
     }
 
     @Override
@@ -45,6 +66,6 @@ public class TTISUser implements TTISUserDetails {
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 }

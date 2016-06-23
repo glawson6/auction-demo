@@ -1,0 +1,9 @@
+{
+  "email":"scoobydoo@hotmail.com",
+  "username":"scooby6",
+  "password":"",
+  "firstName":"scooby",
+  "lastName":"doo",
+  "permissions":["EATING.SNACKS"],
+  "roles":["SNACK.EATER"]
+}

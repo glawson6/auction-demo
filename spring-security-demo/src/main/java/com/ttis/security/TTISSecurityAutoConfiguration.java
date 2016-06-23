@@ -4,19 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.vote.AffirmativeBased;
@@ -31,10 +27,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
-import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
-import org.springframework.security.ldap.authentication.BindAuthenticator;
-import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
-import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
 
@@ -109,15 +101,14 @@ public class TTISSecurityAutoConfiguration {
 
         @Bean
         AuthenticationUserDetailsService authenticationUserDetailsService(){
-            if (null != ttisSecurityProperties.getAuthzTokenURL() && null != ttisSecurityProperties.getProductToken() ){
-                logger.info("Using TTISUserDetailsServiceImpl...");
-
-                TTISUserDetailsServiceImpl userDetailsService = new TTISUserDetailsServiceImpl();
+            if (ttisSecurityProperties.isLocalUserRepo()){
+                logger.info("Using FileUserDetailsServiceImpl with user file {}",ttisSecurityProperties.getUserFile());
+                FileUserDetailsServiceImpl userDetailsService = new FileUserDetailsServiceImpl();
+                userDetailsService.setUserDetailsJSONFile(ttisSecurityProperties.getUserFile());
                 return userDetailsService;
             } else {
-                logger.info("Using LocalUserDetailsServiceImpl with user file {}",ttisSecurityProperties.getUserFile());
-                LocalUserDetailsServiceImpl userDetailsService = new LocalUserDetailsServiceImpl();
-                userDetailsService.setUserDetailsJSONFile(ttisSecurityProperties.getUserFile());
+                logger.info("Using TTISUserDetailsServiceImpl...");
+                TTISUserDetailsServiceImpl userDetailsService = new TTISUserDetailsServiceImpl();
                 return userDetailsService;
             }
 

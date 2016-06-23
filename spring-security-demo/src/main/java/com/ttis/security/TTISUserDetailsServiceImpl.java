@@ -14,8 +14,6 @@ public class TTISUserDetailsServiceImpl implements AuthenticationUserDetailsServ
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TTISUserDetailsServiceImpl.class);
 
-    @Autowired
-    AuthenticationUserDetailsService vosIAMUserDetailsService;
 
     @Override
     public UserDetails loadUserDetails(Authentication authentication) throws UsernameNotFoundException {
@@ -26,7 +24,7 @@ public class TTISUserDetailsServiceImpl implements AuthenticationUserDetailsServ
         UserDetails principal = null;
         try {
 
-                principal = vosIAMUserDetailsService.loadUserDetails(authentication);
+               // principal = userDetailsService.loadUserDetails(authentication);
 
         } catch (UsernameNotFoundException ex ){
             LOGGER.error("Exception while loading userdetails for user {}", userName, ex);

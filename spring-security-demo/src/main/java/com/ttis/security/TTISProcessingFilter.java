@@ -40,21 +40,19 @@ public class TTISProcessingFilter extends GenericFilterBean {
         HttpServletResponse response = (HttpServletResponse) resp;
         HttpServletRequest request = (HttpServletRequest) req;
         String authHeaderContent = request.getHeader(HEADER_UID);
-        String decoded = new String(Base64.decodeBase64(authHeaderContent));
-        String user = decoded.substring(0, decoded.indexOf(":"));
-        String password = decoded.substring(decoded.indexOf(":")+1);
-        LOGGER.debug("uid {} user {} password {}", new Object[]{authHeaderContent, user, password});
-        if (StringUtils.isNotEmpty(authHeaderContent)) {
 
+        if (StringUtils.isNotEmpty(authHeaderContent) || StringUtils.isNotBlank(authHeaderContent)) {
+            String decoded = new String(Base64.decodeBase64(authHeaderContent));
+            String user = decoded.substring(0, decoded.indexOf(":"));
+            String password = decoded.substring(decoded.indexOf(":")+1);
+            LOGGER.debug("uid {} user {} password {}", new Object[]{authHeaderContent, user, password});
             try {
-            //    PreAuthenticatedAuthenticationToken authToken = new PreAuthenticatedAuthenticationToken(authHeaderContent, "N/A" );
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user, password);
                 Authentication authentication = authenticationManager.authenticate(authToken);
                 PreAuthenticatedAuthenticationToken preAuthToken = new PreAuthenticatedAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials(),authentication.getAuthorities());
                 preAuthToken.setAuthenticated(true);
                 LOGGER.debug("Granted authories authentication {}",authentication.getAuthorities().toString());
                 LOGGER.debug("Granted authories preAuthToken {}",preAuthToken.getAuthorities().toString());
-                //authentication.setAuthenticated(true);
                 SecurityContextHolder.getContext().setAuthentication(preAuthToken);
 
             } catch (AuthenticationException ae) {

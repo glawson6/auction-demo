@@ -7,26 +7,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "ttis.security", ignoreUnknownFields = true)
 public class TTISSecurityProperties {
-    private String userFile = "classpath:examplelocaluserdetails.json";
+    private String userFile = "classpath:userDetails.json";
     private String rolePrefix = "ROLE.";
     private String permissionPrefix = "TTIS.";
-    private String authzTokenURL;
-    private String productToken;
+    private boolean localUserRepo;
 
-    public String getUserFile() {
-        return userFile;
+    public boolean isLocalUserRepo() {
+        return localUserRepo;
     }
 
-    public void setUserFile(String userFile) {
-        this.userFile = userFile;
-    }
-
-    public String getRolePrefix() {
-        return rolePrefix;
-    }
-
-    public void setRolePrefix(String rolePrefix) {
-        this.rolePrefix = rolePrefix;
+    public void setLocalUserRepo(boolean localUserRepo) {
+        this.localUserRepo = localUserRepo;
     }
 
     public String getPermissionPrefix() {
@@ -37,19 +28,19 @@ public class TTISSecurityProperties {
         this.permissionPrefix = permissionPrefix;
     }
 
-    public String getAuthzTokenURL() {
-        return authzTokenURL;
+    public String getRolePrefix() {
+        return rolePrefix;
     }
 
-    public void setAuthzTokenURL(String authzTokenURL) {
-        this.authzTokenURL = authzTokenURL;
+    public void setRolePrefix(String rolePrefix) {
+        this.rolePrefix = rolePrefix;
     }
 
-    public String getProductToken() {
-        return productToken;
+    public String getUserFile() {
+        return userFile;
     }
 
-    public void setProductToken(String productToken) {
-        this.productToken = productToken;
+    public void setUserFile(String userFile) {
+        this.userFile = userFile;
     }
 }
